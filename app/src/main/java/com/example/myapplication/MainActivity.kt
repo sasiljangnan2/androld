@@ -25,6 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Scaffold( modifier = Modifier.fillMaxSize(),
-                    bottomBar = {BottomBar()}) { innerPadding ->
+                    ) { innerPadding ->
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
@@ -46,39 +51,50 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Row(modifier = modifier) {
-        Box{
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Image(
                 painter = painterResource(R.drawable.android),
-                contentDescription = "My Image")
-            Text("Hansung", modifier= Modifier.align(Alignment.BottomCenter))
+                contentDescription = "My Image"
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Login", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text( "본인은 이 과제를 직접 했음을 맹세합니다.\n 2271407 김준휘", )
+            Spacer(modifier = Modifier.height(30.dp))
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+            Row{
+                Button(modifier = Modifier.weight(1f), onClick = {}) {
+                    Text("Login")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(modifier = Modifier.weight(1f), onClick = {}) {
+                    Text("Register")
+                }
+            }
         }
-        Column{
-            Text(
-                text = "Hello $name!"
-                )
-            Text("University", fontSize =  20.sp, fontWeight =  FontWeight.Bold)
 
 
-        }
-    Spacer(modifier = Modifier.width(16.dp))
-    Text(
-        text = "jack!"
-    )
+
     }
 }
 
-@Composable
-fun BottomBar() {
-    NavigationBar() {
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Text("Home")
-            Spacer(modifier = Modifier.width(16.dp))
-            Text("Profile")
-            Spacer(modifier = Modifier.width(16.dp))
-            Text("Settings")
-        }
-    }
-}
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
