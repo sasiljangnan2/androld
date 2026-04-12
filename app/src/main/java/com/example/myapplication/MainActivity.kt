@@ -103,7 +103,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier, viewModel: UserViewMod
             value = inputValue.value,
             onValueChange = { inputValue.value = it },
             modifier = Modifier
-                .testTag("textfield")
+                .testTag("textField")
                 .fillMaxWidth(0.7f)
         )
         Spacer(modifier = Modifier.height(30.dp))
