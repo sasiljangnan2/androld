@@ -1,97 +1,126 @@
 package com.example.myapplication
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import android.content.Intent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.launch
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                Scaffold( modifier = Modifier.fillMaxSize(),
-                    ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainScreen()
             }
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val displayText = remember { mutableStateOf("Logout") }
-    val context = androidx.compose.ui.platform.LocalContext.current
+fun MainScreen() {
+    val itemsList = remember { mutableStateListOf<String>() }
+    var openDialog by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf("") }
 
-    val activityResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val returnedString = result.data?.getStringExtra("ResultString") ?: ""
-            displayText.value = returnedString
-        } else if (result.resultCode == android.app.Activity.RESULT_CANCELED) {
-            displayText.value = "Failed"
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("ActionButton"),
+                onClick = {
+                    name = ""
+                    openDialog = true
+                }
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Add")
+            }
         }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .semantics { testTagsAsResourceId = true },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = {
-                val intent = Intent(context, LoginActivity::class.java)
-                activityResultLauncher.launch(intent)
-            },
-            modifier = Modifier.testTag("button")
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            Text("Login")
+            items(itemsList) { item ->
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            modifier = Modifier
+                                .semantics { testTagsAsResourceId = true }
+                                .testTag("Text"),
+                            text = item
+                        )
+                    }
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(30.dp))
-        Text(
-            text = displayText.value,
-            modifier = Modifier.testTag("userText")
-        )
+
+        if (openDialog) {
+            AlertDialog(
+                onDismissRequest = { openDialog = false },
+                title = { Text("항목 추가") },
+                text = {
+                    TextField(
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("TextField"),
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Name") }
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .testTag("Button"),
+                        onClick = {
+                            if (name.isNotBlank()) {
+                                itemsList.add(name)
+                            }
+                            openDialog = false
+                        }
+                    ) {
+                        Text("Confirm")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { openDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
     }
 }
-@Preview(showBackground = true, locale =
-"ko")
+
+@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainScreenPreview() {
     MyApplicationTheme {
-        Greeting("Android")
+        MainScreen()
     }
 }
