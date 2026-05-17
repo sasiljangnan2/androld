@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
+    <!-- 권한: 통화기록 및 연락처 조회 (런타임 권한 요청 필요) -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- 테스트 시 에뮬레이터에서 통화기록 삽입 필요하면 아래 권한을 추가하세요 (서명 제약이 있을 수 있음) -->
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -23,10 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyApplication" />
     </application>
 
 </manifest>
