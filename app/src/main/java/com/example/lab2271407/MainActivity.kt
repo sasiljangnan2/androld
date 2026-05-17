@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.lab2271407
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,31 +6,27 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import kotlinx.coroutines.launch
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.ui.unit.dp
+import com.example.lab2271407.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                MainScreen()
+                val viewModel: ViewModel = viewModel(factory = ViewModel.Factory)
+                MainScreen(viewModel)
             }
         }
     }
@@ -38,8 +34,9 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    val itemsList = remember { mutableStateListOf<String>() }
+fun MainScreen(viewModel: ViewModel? = null) {
+    val fallbackFlow = remember { MutableStateFlow(emptyList<ItemEntity>()) }
+    val itemsList by (viewModel?.allItems ?: fallbackFlow).collectAsState()
     var openDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
 
@@ -71,7 +68,7 @@ fun MainScreen() {
                             modifier = Modifier
                                 .semantics { testTagsAsResourceId = true }
                                 .testTag("Text"),
-                            text = item
+                            text = item.name
                         )
                     }
                 )
@@ -99,7 +96,7 @@ fun MainScreen() {
                             .testTag("Button"),
                         onClick = {
                             if (name.isNotBlank()) {
-                                itemsList.add(name)
+                                viewModel?.insert(name)
                             }
                             openDialog = false
                         }
